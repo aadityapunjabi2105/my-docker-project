@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USERNAME = 'your-dockerhub-username'
-        DOCKER_HUB_PASSWORD = 'your-dockerhub-password'
         IMAGE_NAME = 'your-dockerhub-username/your-image-name'  // Update with your Docker image name
     }
 
@@ -24,8 +22,11 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
-                // Log in to Docker Hub
-                sh "echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
+                // Login to Docker Hub using Jenkins Credentials
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    // Log in to Docker Hub using the Access Token
+                    sh "echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
+                }
             }
         }
 
